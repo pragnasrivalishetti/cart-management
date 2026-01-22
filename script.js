@@ -1,27 +1,27 @@
 let cart = [];
 let total = 0;
-let cartFinalized = false;
 
+// Show Store Screen
+function showStore() {
+  document.getElementById("welcome-screen").classList.add("hidden");
+  document.getElementById("store-screen").classList.remove("hidden");
+  renderCart();
+}
+
+// Add item to cart
 function addToCart(name, price) {
-  if (cartFinalized) {
-    alert("Cart already finalized. Proceed to payment.");
-    return;
-  }
-
   const item = cart.find(p => p.name === name);
   if (item) {
     item.quantity += 1;
   } else {
     cart.push({ name, price, quantity: 1 });
   }
-
   total += price;
   renderCart();
 }
 
+// Remove item from cart
 function removeFromCart(name) {
-  if (cartFinalized) return;
-
   const index = cart.findIndex(p => p.name === name);
   if (index > -1) {
     total -= cart[index].price * cart[index].quantity;
@@ -30,18 +30,18 @@ function removeFromCart(name) {
   renderCart();
 }
 
+// Update quantity
 function updateQuantity(name, qty) {
-  if (cartFinalized) return;
-
   const item = cart.find(p => p.name === name);
   if (item) {
     total -= item.price * item.quantity;
-    item.quantity = qty;
+    item.quantity = qty > 0 ? qty : 1;
     total += item.price * item.quantity;
   }
   renderCart();
 }
 
+// Render cart
 function renderCart() {
   const cartList = document.getElementById("cart");
   cartList.innerHTML = "";
@@ -52,7 +52,7 @@ function renderCart() {
       ${item.name} (x${item.quantity}) - ₹${item.price * item.quantity}
       <div>
         <button onclick="updateQuantity('${item.name}', ${item.quantity + 1})">+</button>
-        <button onclick="updateQuantity('${item.name}', ${item.quantity - 1 > 0 ? item.quantity - 1 : 1})">-</button>
+        <button onclick="updateQuantity('${item.name}', ${item.quantity - 1})">-</button>
         <button onclick="removeFromCart('${item.name}')">❌</button>
       </div>
     `;
@@ -62,24 +62,13 @@ function renderCart() {
   document.getElementById("total").innerText = `Total: ₹${total}`;
 }
 
+// Finalize Cart
 function finalizeCart() {
   if (cart.length === 0) {
     alert("Your cart is empty!");
     return;
   }
 
-  cartFinalized = true;
-  document.getElementById("cart-actions").classList.add("hidden");
-  document.getElementById("payment-section").classList.remove("hidden");
-  alert("✅ Cart finalized. Proceed to payment.");
-}
-
-function pay() {
-  alert(`💳 Payment successful! Total paid: ₹${total}`);
-  cart = [];
-  total = 0;
-  cartFinalized = false;
-  renderCart();
-  document.getElementById("payment-section").classList.add("hidden");
-  document.getElementById("cart-actions").classList.remove("hidden");
+  document.getElementById("store-screen").classList.add("hidden");
+  document.getElementById("thankyou-screen").classList.remove("hidden");
 }
